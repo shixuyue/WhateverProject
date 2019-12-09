@@ -11,6 +11,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
+using WhateverProject.Options;
+using Swashbuckle.AspNetCore.Swagger;
+using SwaggerOptions = WhateverProject.Options.SwaggerOptions;
 
 namespace WhateverProject
 {
@@ -33,6 +36,11 @@ namespace WhateverProject
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
             services.AddRazorPages();
+            services.AddSwaggerGen(x=> 
+                {
+                    x.SwaggerDoc("v1", new Info { Title = "Test API", Version = "V1" });
+                }
+            );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -46,6 +54,20 @@ namespace WhateverProject
             {
                 app.UseHsts();
             }
+
+            var swaggerOptions = new SwaggerOptions();
+            Configuration.GetSection(nameof(SwaggerOptions)).Bind(swaggerOptions);
+
+            app.UseSwagger(option =>
+            {
+                option.RouteTemplate = swaggerOptions.JsonRoute;
+            });
+
+            app.UseSwaggerUI(option =>
+           {
+               option.SwaggerEndpoint(swaggerOptions.UIEndpoint, swaggerOptions.Description);
+           });
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
