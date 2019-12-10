@@ -14,6 +14,8 @@ using Microsoft.EntityFrameworkCore;
 using WhateverProject.Options;
 using Swashbuckle.AspNetCore.Swagger;
 using SwaggerOptions = WhateverProject.Options.SwaggerOptions;
+using Microsoft.OpenApi.Models;
+using WhateverProject.Installer;
 
 namespace WhateverProject
 {
@@ -29,18 +31,7 @@ namespace WhateverProject
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
-            services.AddControllersWithViews();
-            services.AddRazorPages();
-            services.AddSwaggerGen(x=> 
-                {
-                    x.SwaggerDoc("v1", new Info { Title = "Test API", Version = "V1" });
-                }
-            );
+            services.InstallByAssembly(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
